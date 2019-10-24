@@ -10,7 +10,7 @@ Use [the changelog guidelines](https://git.io/polaris-changelog-guidelines) to f
 
 ### Enhancements
 
-- Updated the type of the `title` prop in `ChoiceList` from `string` to `ReactNode` ([#2351](https://github.com/Shopify/polaris-react/pull/2355))
+- Updated the type of the `title` prop in `ChoiceList` from `string` to `ReactNode` ([#2355](https://github.com/Shopify/polaris-react/pull/2355))
 
 ### Bug fixes
 
