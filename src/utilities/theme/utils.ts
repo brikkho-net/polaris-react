@@ -1,6 +1,12 @@
 import tokens from '@shopify/polaris-tokens';
-import {HSLColor, HSLAColor} from '../color-types';
-import {colorToHsla, hslToString, hslToRgb} from '../color-transformers';
+import {hexToHsluv, ColorTuple, hsluvToHex} from 'hsluv';
+import {HSLColor} from '../color-types';
+import {
+  colorToHsla,
+  hslToString,
+  hslToRgb,
+  hexToRgb,
+} from '../color-transformers';
 import {isLight} from '../color-validation';
 import {constructColorName} from '../color-names';
 import {createLightColor} from '../color-manipulation';
@@ -70,25 +76,25 @@ export function buildColors(theme: ThemeConfig) {
   } = UNSTABLE_colors;
   /* eslint-enable babel/camelcase */
 
-  const lightSurface = isLight(hslToRgb(colorToHsla(surface)));
+  const lightSurface = isLight(hexToRgb(surface));
 
   return {
     ...customPropertyTransformer({
-      ...surfaceColors(colorToHsla(surface), lightSurface),
-      ...onSurfaceColors(colorToHsla(onSurface), lightSurface),
-      ...interactiveColors(colorToHsla(interactive), lightSurface),
-      ...neutralColors(colorToHsla(neutral), lightSurface),
-      ...brandedColors(colorToHsla(branded), lightSurface),
-      ...criticalColors(colorToHsla(critical), lightSurface),
-      ...warningColors(colorToHsla(warning), lightSurface),
-      ...highlightColors(colorToHsla(highlight), lightSurface),
-      ...successColors(colorToHsla(success), lightSurface),
+      ...surfaceColors(hexToHsluv(surface), lightSurface),
+      ...onSurfaceColors(hexToHsluv(onSurface), lightSurface),
+      ...interactiveColors(hexToHsluv(interactive), lightSurface),
+      ...neutralColors(hexToHsluv(neutral), lightSurface),
+      ...brandedColors(hexToHsluv(branded), lightSurface),
+      ...criticalColors(hexToHsluv(critical), lightSurface),
+      ...warningColors(hexToHsluv(warning), lightSurface),
+      ...highlightColors(hexToHsluv(highlight), lightSurface),
+      ...successColors(hexToHsluv(success), lightSurface),
     }),
     ...overrides(),
   };
 }
 
-function surfaceColors(color: HSLAColor, lightSurface: boolean) {
+function surfaceColors(color: ColorTuple, lightSurface: boolean) {
   return {
     surface: color,
     surfaceBackground: setLightness(color, lightSurface ? 98 : 7),
@@ -100,7 +106,7 @@ function surfaceColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function onSurfaceColors(color: HSLAColor, lightSurface: boolean) {
+function onSurfaceColors(color: ColorTuple, lightSurface: boolean) {
   return {
     onSurface: color,
     actionOnDark: setLightness(color, 76),
@@ -158,7 +164,7 @@ function onSurfaceColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function interactiveColors(color: HSLAColor, lightSurface: boolean) {
+function interactiveColors(color: ColorTuple, lightSurface: boolean) {
   return {
     interactive: color,
     interactiveAction: setLightness(color, lightSurface ? 44 : 56),
@@ -173,7 +179,7 @@ function interactiveColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function neutralColors(color: HSLAColor, lightSurface: boolean) {
+function neutralColors(color: ColorTuple, lightSurface: boolean) {
   return {
     neutral: color,
     neutralActionDisabled: setLightness(color, lightSurface ? 94 : 13),
@@ -183,7 +189,7 @@ function neutralColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function brandedColors(color: HSLAColor, lightSurface: boolean) {
+function brandedColors(color: ColorTuple, lightSurface: boolean) {
   return {
     branded: color,
     brandedAction: setLightness(color, 25),
@@ -209,7 +215,7 @@ function brandedColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function criticalColors(color: HSLAColor, lightSurface: boolean) {
+function criticalColors(color: ColorTuple, lightSurface: boolean) {
   return {
     critical: color,
     criticalDivider: setLightness(color, lightSurface ? 52 : 48),
@@ -225,7 +231,7 @@ function criticalColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function warningColors(color: HSLAColor, lightSurface: boolean) {
+function warningColors(color: ColorTuple, lightSurface: boolean) {
   return {
     warning: color,
     warningDivider: setLightness(color, lightSurface ? 66 : 34),
@@ -236,7 +242,7 @@ function warningColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function highlightColors(color: HSLAColor, lightSurface: boolean) {
+function highlightColors(color: ColorTuple, lightSurface: boolean) {
   return {
     highlight: color,
     highlightDivider: setLightness(color, lightSurface ? 58 : 42),
@@ -247,7 +253,7 @@ function highlightColors(color: HSLAColor, lightSurface: boolean) {
   };
 }
 
-function successColors(color: HSLAColor, lightSurface: boolean) {
+function successColors(color: ColorTuple, lightSurface: boolean) {
   return {
     success: color,
     successDivider: setLightness(color, lightSurface ? 25 : 35),
@@ -298,11 +304,13 @@ function overrides() {
   };
 }
 
-function customPropertyTransformer(colors: {[key: string]: HSLAColor}) {
+function customPropertyTransformer(colors: {[key: string]: ColorTuple}) {
   return Object.entries(colors).reduce(
     (transformed, [key, value]) => ({
       ...transformed,
-      [toCssCustomPropertySyntax(key)]: hslToString(value),
+      [toCssCustomPropertySyntax(key)]: hslToString(
+        colorToHsla(hsluvToHex(value)),
+      ),
     }),
     {},
   );
@@ -313,17 +321,17 @@ function toCssCustomPropertySyntax(camelCase: string) {
 }
 
 function setLightness(
-  {hue, saturation, alpha}: HSLAColor,
+  [hue, saturation, _lightness]: ColorTuple,
   lightness: number,
-): HSLAColor {
-  return {hue, saturation, lightness, alpha};
+): ColorTuple {
+  return [hue, saturation, lightness];
 }
 
 function setSaturation(
-  {hue, lightness, alpha}: HSLAColor,
+  [hue, _saturation, lightness]: ColorTuple,
   saturation: number,
-): HSLAColor {
-  return {hue, saturation, lightness, alpha};
+): ColorTuple {
+  return [hue, saturation, lightness];
 }
 
 function buildLegacyColors(theme?: ThemeConfig): CustomPropertiesLike {
