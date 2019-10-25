@@ -308,6 +308,15 @@ function overrides() {
     [toCssCustomPropertySyntax('textFieldFocusRingOffset')]: rem('-4px'),
     [toCssCustomPropertySyntax('textFieldFocusRingBorderRadius')]: rem('7px'),
     [toCssCustomPropertySyntax('focusRingStroke')]: rem('2px'),
+    [toCssCustomPropertySyntax(
+      'cardShadow',
+    )]: '0px 0px 5px var(--p-surface-inverse-opacified-shallow), 0px 1px 2px var(--p-surface-inverse-opacified)',
+    [toCssCustomPropertySyntax(
+      'popoverShadow',
+    )]: '-1px 0px 20px var(--p-surface-inverse-opacified-shallow), 0px 1px 5px var(--p-surface-inverse-opacified)',
+    [toCssCustomPropertySyntax(
+      'modalShadow',
+    )]: '0px 6px 32px var(--p-surface-inverse-opacified-shallow), 0px 1px 6px var(--p-surface-inverse-opacified)',
   };
 }
 
