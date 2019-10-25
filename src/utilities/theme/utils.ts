@@ -97,6 +97,19 @@ function surfaceColors(color: HSLAColor, lightSurface: boolean) {
     surfaceInverse: setLightness(color, lightSurface ? 0 : 100),
     surfaceHovered: setLightness(color, lightSurface ? 93 : 20),
     surfacePressed: setLightness(color, lightSurface ? 86 : 27),
+    surfaceInverseOpacifiedShallow: {
+      hue: 180,
+      saturation: 5,
+      lightness: 8,
+      alpha: 0.05,
+    },
+    surfaceInverseOpacified: {hue: 0, saturation: 0, lightness: 0, alpha: 0.15},
+    surfaceInverseOpacifiedDeep: {
+      hue: 0,
+      saturation: 0,
+      lightness: 0,
+      alpha: 0.5,
+    },
   };
 }
 
